@@ -14,14 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Scanner;
-import java.util.Set;
+import java.sql.Array;
+import java.util.*;
 
 /*
  * NOTE : =============================================================
@@ -135,7 +129,9 @@ public class AddressBook {
 
     private static final String DIVIDER = "===================================================";
 
-
+    // AB1 LO Edit
+    private static final String COMMAND_LEXICO_LIST = "sortedlist";
+    private static final ArrayList<String> SORTEDLIST = new ArrayList<>();
     /* We use a String array to store details of a single person.
      * The constants given below are the indexes for the different data elements of a person
      * used by the internal String[] storage format.
@@ -383,6 +379,8 @@ public class AddressBook {
             return getUsageInfoForAllCommands();
         case COMMAND_EXIT_WORD:
             executeExitProgramRequest();
+        case COMMAND_LEXICO_LIST:
+            return executeLexicoList();
         default:
             return getMessageForInvalidCommandInput(commandType, getUsageInfoForAllCommands());
         }
@@ -512,6 +510,7 @@ public class AddressBook {
                                                           : MESSAGE_PERSON_NOT_IN_ADDRESSBOOK; // not found
     }
 
+
     /**
      * Checks validity of delete person argument string's format.
      *
@@ -568,6 +567,21 @@ public class AddressBook {
         return MESSAGE_ADDRESSBOOK_CLEARED;
     }
 
+    private static String executeLexicoList() {
+        //Copy Array over.
+        ArrayList<String[]> toBeDisplayed = getAllPersonsInAddressBook();
+        /**
+         * Transfer data to new list. Prevent change of overall data.
+         */
+        ArrayList<String[]> newList = new ArrayList<>(toBeDisplayed);
+        /**
+         * Sort name lexicographically.
+         */
+        newList.sort((String[] o1, String[] o2)->(o1.toString().compareTo(o2.toString())));
+        showToUser(newList);
+        return getMessageForPersonsDisplayedSummary(newList);
+    }
+
     /**
      * Displays all persons in the address book to the user; in added order.
      *
@@ -599,6 +613,7 @@ public class AddressBook {
      * @return full line entered by the user
      */
     private static String getUserInput() {
+
         System.out.print(LINE_PREFIX + "Enter command: ");
         String inputLine = SCANNER.nextLine();
         // silently consume all blank and comment lines
